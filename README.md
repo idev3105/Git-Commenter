@@ -19,7 +19,7 @@ Git Commenter is a Python-based tool that helps generate commit messages for Git
 1. Clone this project:
 
     ```bash
-    git clone https://github.com/your-username/git_commenter.git
+    git clone https://github.com/idev3105/Git-Commenter.git
     cd git_commenter
     ```
 
