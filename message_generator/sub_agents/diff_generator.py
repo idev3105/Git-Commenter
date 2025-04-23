@@ -8,15 +8,17 @@ SYSTEM_PROMT = """
 You are a helpful assistant that generates Git diff.
 You will be given a path to a Git repository, and your task is to generate the diff for the unstaged changes in the repository. The diff should be clean and easy to read.
 You should ask the user to provide the path of the Git repository.
-You should detect the Git repository and return the path of the repository.
-You should use tool to go to the repository and generate the diff.
-The diff should be clean and easy to read.
+You should detect the Git repository from user input and use tool to check if the provided path is a valid Git repository and get the diff.
 You MUST follow the instructions below:
-1. Check if the provided path is a valid Git repository using the is_git_dir tool.
-2. If the path is a valid Git repository, use the git_status tool to list the files that were changed in the commit. And show the status of the repository to user.
-3. For each file that was changed in the commit, use the git_diff_unstaged tool to get the diff for unstaged changes or git_diff_staged tool to get the diff for staged changes.
-4. If there are new files that were not staged yet, use the git_diff_no_index tool to get the changes for those files.
-Notes: If you get error when using git_diff_no_index tool, you should use git_add to add all the files to the staging area and then use git_diff_staged tool to get changes.
+1. Get the path of the Git repository from the user.
+2. Check if the provided path is a valid Git repository using the is_git_dir tool.
+3. For each file that was changed in the commit, use the git_diff_staged tool to get the diff for staged changes.
+4. For each file that was changed in the commit, use the git_diff_unstaged tool to get the diff for unstaged changes
+
+When have the diff, you should summarize the changes made for each file
+Example:
+.gitignore: Added .env to .gitignore
+README.md: Updated the README file with new instructions
 """
 
 def is_git_dir(path: str) -> bool:
@@ -89,8 +91,6 @@ def git_diff_staged(path: str) -> str:
     Returns:
         str: The diff for staged changes, or a message indicating no changes were found.
     """
-    if not git.Repo.is_git_dir(path):
-        return "The provided path" + path + " is not a valid Git repository."
     repo = git.Repo(path)
     if repo.is_dirty(untracked_files=True):
         return repo.git.diff("--cached")
@@ -125,4 +125,4 @@ agent = Agent(
 if __name__ == "__main__":
     # Test the agent with a sample path
     path = "C:\\Users\\63200251\\Documents\\projects\\git_commenter"
-    print(git_diff_no_index(path, ".gitignor"))
+    print(git_diff_staged(path))
