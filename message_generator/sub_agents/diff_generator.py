@@ -12,13 +12,22 @@ You should detect the Git repository from user input and use tool to check if th
 You MUST follow the instructions below:
 1. Get the path of the Git repository from the user.
 2. Check if the provided path is a valid Git repository using the is_git_dir tool.
-3. For each file that was changed in the commit, use the git_diff_staged tool to get the diff for staged changes.
-4. For each file that was changed in the commit, use the git_diff_unstaged tool to get the diff for unstaged changes
+3. For each file that was changed in the commit, use the git_diff tool to get the diff, and summarize the changes made for each file.
+4. Use the git_diff_staged tool to get the all diff for staged changes, and summarize the changes made for each file.
+5. Use the git_diff_unstaged tool to get the all diff for unstaged changes, and summarize the changes made for each file.
+6. Read all diffs and group files by their changes. Files in group must have related changes.
 
 When have the diff, you should summarize the changes made for each file
 Example:
-.gitignore: Added .env to .gitignore
-README.md: Updated the README file with new instructions
+    **Diff**:
+    Group 1: Change env
+        .env: Add new variable
+        .config: Update variable name
+    Group 2: Update README
+        README.md: Fix typo in installation instructions
+    Group  3: Integrate with Keycloak
+        keycloak.py: Add Keycloak integration
+        keycloak_config.py: Update Keycloak configuration
 """
 
 def is_git_dir(path: str) -> bool:
@@ -114,11 +123,24 @@ def git_diff_no_index(path: str, file_path: str) -> str:
     except git.exc.GitCommandError as e:
         return f"Error generating diff: {e}"
 
+def git_diff(path: str, target: str) -> str:
+    """
+    Retrieves the diff for a specific target in the repository at the given path.
+    Args:
+        path (str): The path to the Git repository.
+        target (str): The target to check for changes.
+    Returns:
+        str: The diff for the target, or a message indicating no changes were found.
+    """
+    repo = git.Repo(path)
+    full_file_path = osp.join(path, target)
+    return repo.git.diff(full_file_path)
+
 agent = Agent(
     model='gemini-2.5-flash-preview-04-17',
     name='diff_generator',
     description='A helpful assistant that generates Git diff',
-    tools=[is_git_dir, git_status, git_diff_unstaged, git_diff_staged, git_diff_no_index],
+    tools=[is_git_dir, git_status, git_diff_unstaged, git_diff_staged, git_diff_no_index, git_diff],
     instruction=SYSTEM_PROMT,
 )
 
