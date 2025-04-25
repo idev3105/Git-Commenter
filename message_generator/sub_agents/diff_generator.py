@@ -17,7 +17,7 @@ You should detect the Git repository from user input and use tool to check if th
 You MUST follow the instructions below:
 1. Get the path of the Git repository from the user.
 2. Check if the provided path is a valid Git repository using the is_git_dir tool.
-3. You must use the git_status tool to get the status of the repository, including staged and unstaged changes.
+3. You must use the git_status tool to get all changed file, including staged and unstaged changes.
 4. For each file that was changed in the commit, use the git_diff tool to get the diff, and summarize the changes made for each file.
 5. Use the git_diff_staged tool to get the all diff for staged changes, and summarize the changes made for each file.
 6. Use the git_diff_unstaged tool to get the all diff for unstaged changes, and summarize the changes made for each file.
